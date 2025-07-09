@@ -1,10 +1,12 @@
 const express = require('express');
 const { Configuration, OpenAIApi } = require('openai');
 const bodyParser = require('body-parser');
+const path = require('path');
+
 const app = express();
 
 app.use(bodyParser.json());
-app.use(express.static('.'));
+app.use(express.static(path.join(__dirname)));
 
 const openai = new OpenAIApi(new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -12,6 +14,7 @@ const openai = new OpenAIApi(new Configuration({
 
 app.post('/chat', async (req, res) => {
   const { message, mode } = req.body;
+
   const systemPrompt = mode === 'desqueter'
     ? 'Você é DESQUETER, enigmático, direto, estilo GPT-6.'
     : 'Você é EQUESTER, IA precisa e avançada.';
@@ -29,6 +32,10 @@ app.post('/chat', async (req, res) => {
     console.error(err);
     res.status(500).json({ reply: 'Erro interno ao processar a IA.' });
   }
+});
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 const PORT = process.env.PORT || 3000;
